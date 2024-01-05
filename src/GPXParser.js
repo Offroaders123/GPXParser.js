@@ -75,7 +75,7 @@ parse(gpxstring) {
     var wpts = [...this.xmlSource.querySelectorAll('wpt')];
     for (let idx in wpts){
         var wpt = wpts[idx];
-        /** @type {import('../index.js').Point} */
+        /** @type {import('../index.js').Waypoint} */
         let pt  = {};
         pt.name = keepThis.getElementValue(wpt, "name");
         pt.sym  = keepThis.getElementValue(wpt, "sym");
@@ -118,6 +118,7 @@ parse(gpxstring) {
         }
         route.link = link;
 
+        /** @type {import('../index.js').Point[]} */
         let routepoints = [];
         var rtepts = [...rte.querySelectorAll('rtept')];
 
@@ -170,7 +171,7 @@ parse(gpxstring) {
         }
         track.link = link;
 
-        /** @type {import('../index.js').Track[]} */
+        /** @type {import('../index.js').Point[]} */
         let trackpoints = [];
         let trkpts = [...trk.querySelectorAll('trkpt')];
 	    for (let idxIn in trkpts){
@@ -378,7 +379,7 @@ calculSlope(points, cumul) {
 toGeoJSON() {
     var GeoJSON = {
         "type": "FeatureCollection",
-        /** @type {{ type: string; geometry: { type: string; coordinates: [number, number, number][]; }; properties: import('../index.js').Track; }[]} */
+        /** @type {{ type: string; geometry: { type: string; coordinates: [number, number, number | null][]; }; properties: import('../index.js').Track; }[]} */
         "features": [],
         "properties": {
             "name": this.metadata.name,

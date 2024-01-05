@@ -1,19 +1,20 @@
 export type MetaData = {
   name: string
   desc: string
-  link: string
-  author: number
+  link: Link
+  author: Author
   time: Date
 }
 
 export type Waypoint = {
   name: string
+  sym: string
   cmt: string
   desc: string
   lat: number
   lon: number
-  ele: number
-  time: Date
+  ele: number | null
+  time: Date | null
 }
 
 export type Track = {
@@ -23,7 +24,7 @@ export type Track = {
   src: string
   number: string
   link: Link
-  type: string
+  type: string | null
   points: Point[]
   distance: Distance
   elevation: Elevation
@@ -36,8 +37,8 @@ export type Route = {
   desc: string
   src: string
   number: string
-  link: string
-  type: string
+  link: Link
+  type: string | null
   points: Point[]
   distance: Distance
   elevation: Elevation
@@ -47,13 +48,13 @@ export type Route = {
 export type Point = {
   lat: number
   lon: number
-  ele: number
-  time: Date
+  ele: number | null
+  time: Date | null
 }
 
 export type Distance = {
   total: number
-  cumul: number
+  cumul: number[]
 }
 
 export type Elevation = {
