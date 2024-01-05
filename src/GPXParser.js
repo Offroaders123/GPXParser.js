@@ -3,7 +3,9 @@
  * 
  * @constructor
  */
-let gpxParser = function () {
+class gpxParser {
+
+constructor() {
     this.xmlSource = "";
     this.metadata  = {};
     this.waypoints = [];
@@ -18,7 +20,7 @@ let gpxParser = function () {
  * 
  * @return {gpxParser} A GPXParser object
  */
-gpxParser.prototype.parse = function (gpxstring) {
+parse(gpxstring) {
     let keepThis = this;
 
     let domParser = new window.DOMParser();
@@ -187,7 +189,7 @@ gpxParser.prototype.parse = function (gpxstring) {
  * 
  * @return {} The element value
  */
-gpxParser.prototype.getElementValue = function(parent, needle){
+getElementValue(parent, needle){
     let elem = parent.querySelector(needle);
     if(elem != null){
         return elem.innerHTML != undefined ? elem.innerHTML : elem.childNodes[0].data;
@@ -204,7 +206,7 @@ gpxParser.prototype.getElementValue = function(parent, needle){
  * 
  * @return {} The element value
  */
-gpxParser.prototype.queryDirectSelector = function(parent, needle) {
+queryDirectSelector(parent, needle) {
 
     let elements  = parent.querySelectorAll(needle);
     let finalElem = elements[0];
@@ -230,7 +232,7 @@ gpxParser.prototype.queryDirectSelector = function(parent, needle) {
  * 
  * @return {DistanceObject} An object with total distance and Cumulative distances
  */
-gpxParser.prototype.calculDistance = function(points) {
+calculDistance(points) {
     let distance = {};
     let totalDistance = 0;
     let cumulDistance = [];
@@ -254,7 +256,7 @@ gpxParser.prototype.calculDistance = function(points) {
  * 
  * @returns {float} The distance between the two points
  */
-gpxParser.prototype.calcDistanceBetween = function (wpt1, wpt2) {
+calcDistanceBetween(wpt1, wpt2) {
     let latlng1 = {};
     latlng1.lat = wpt1.lat;
     latlng1.lon = wpt1.lon;
@@ -278,7 +280,7 @@ gpxParser.prototype.calcDistanceBetween = function (wpt1, wpt2) {
  * 
  * @returns {ElevationObject} An object with negative and positive height difference and average, max and min altitude data
  */
-gpxParser.prototype.calcElevation = function (points) {
+calcElevation(points) {
     var dp = 0,
         dm = 0,
         ret = {};
@@ -328,7 +330,7 @@ gpxParser.prototype.calcElevation = function (points) {
  * 
  * @returns {SlopeObject} An array of slopes
  */
-gpxParser.prototype.calculSlope = function(points, cumul) {
+calculSlope(points, cumul) {
     let slopes = [];
 
     for (var i = 0; i < points.length - 1; i++) {
@@ -349,7 +351,7 @@ gpxParser.prototype.calculSlope = function(points, cumul) {
  * 
  * @returns {} a GeoJSON formatted Object
  */
-gpxParser.prototype.toGeoJSON = function () {
+toGeoJSON() {
     var GeoJSON = {
         "type": "FeatureCollection",
         "features": [],
@@ -458,6 +460,8 @@ gpxParser.prototype.toGeoJSON = function () {
 
     return GeoJSON;
 };
+
+}
 
 if(typeof module !== 'undefined'){
     require('jsdom-global')();
