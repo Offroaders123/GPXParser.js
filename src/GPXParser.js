@@ -6,10 +6,15 @@
 class gpxParser {
 
 constructor() {
+    /** @type {Document | ""} */
     this.xmlSource = "";
+    /** @type {import('../index.js').MetaData} */
     this.metadata  = {};
+    /** @type {import('../index.js').Waypoint[]} */
     this.waypoints = [];
+    /** @type {import('../index.js').Track[]} */
     this.tracks    = [];
+    /** @type {import('../index.js').Route[]} */
     this.routes    = [];
 };
 
@@ -32,6 +37,7 @@ parse(gpxstring) {
         this.metadata.desc  = this.getElementValue(metadata, "desc");
         this.metadata.time  = this.getElementValue(metadata, "time");
 
+        /** @type {import('../index.js').Author} */
         let author = {};
         let authorElem = metadata.querySelector('author');
         if(authorElem != null){
@@ -43,6 +49,7 @@ parse(gpxstring) {
                 author.email.domain = emailElem.getAttribute("domain");
             }
 
+            /** @type {import('../index.js').Link} */
             let link     = {};
             let linkElem = authorElem.querySelector('link');
             if(linkElem != null){
@@ -54,6 +61,7 @@ parse(gpxstring) {
         }
         this.metadata.author = author;
 
+        /** @type {import('../index.js').Link} */
         let link = {};
         let linkElem = this.queryDirectSelector(metadata, 'link');
         if(linkElem != null){
@@ -64,9 +72,10 @@ parse(gpxstring) {
         }
     }
 
-    var wpts = [].slice.call(this.xmlSource.querySelectorAll('wpt'));
+    var wpts = [...this.xmlSource.querySelectorAll('wpt')];
     for (let idx in wpts){
         var wpt = wpts[idx];
+        /** @type {import('../index.js').Point} */
         let pt  = {};
         pt.name = keepThis.getElementValue(wpt, "name");
         pt.sym  = keepThis.getElementValue(wpt, "sym");
@@ -85,9 +94,10 @@ parse(gpxstring) {
         keepThis.waypoints.push(pt);
     }
 
-    var rtes = [].slice.call(this.xmlSource.querySelectorAll('rte'));
+    var rtes = [...this.xmlSource.querySelectorAll('rte')];
     for (let idx in rtes){
         let rte = rtes[idx];
+        /** @type {import('../index.js').Route} */
         let route = {};
         route.name   = keepThis.getElementValue(rte, "name");
         route.cmt    = keepThis.getElementValue(rte, "cmt");
@@ -98,6 +108,7 @@ parse(gpxstring) {
         let type     = keepThis.queryDirectSelector(rte, "type");
         route.type   = type != null ? type.innerHTML : null;
 
+        /** @type {import('../index.js').Link} */
         let link     = {};
         let linkElem = rte.querySelector('link');
         if(linkElem != null){
@@ -108,10 +119,11 @@ parse(gpxstring) {
         route.link = link;
 
         let routepoints = [];
-        var rtepts = [].slice.call(rte.querySelectorAll('rtept'));
+        var rtepts = [...rte.querySelectorAll('rtept')];
 
         for (let idxIn in rtepts){
             let rtept = rtepts[idxIn];
+            /** @type {import('../index.js').Point} */
             let pt    = {};
             pt.lat    = parseFloat(rtept.getAttribute("lat"));
             pt.lon    = parseFloat(rtept.getAttribute("lon"));
@@ -133,9 +145,10 @@ parse(gpxstring) {
         keepThis.routes.push(route);
     }
 
-    var trks = [].slice.call(this.xmlSource.querySelectorAll('trk'));
+    var trks = [...this.xmlSource.querySelectorAll('trk')];
     for (let idx in trks){
         let trk = trks[idx];
+        /** @type {import('../index.js').Track} */
         let track = {};
 
         track.name   = keepThis.getElementValue(trk, "name");
@@ -147,6 +160,7 @@ parse(gpxstring) {
         let type     = keepThis.queryDirectSelector(trk, "type");
         track.type   = type != null ? type.innerHTML : null;
 
+        /** @type {import('../index.js').Link} */
         let link     = {};
         let linkElem = trk.querySelector('link');
         if(linkElem != null){
@@ -156,10 +170,12 @@ parse(gpxstring) {
         }
         track.link = link;
 
+        /** @type {import('../index.js').Track[]} */
         let trackpoints = [];
-        let trkpts = [].slice.call(trk.querySelectorAll('trkpt'));
+        let trkpts = [...trk.querySelectorAll('trkpt')];
 	    for (let idxIn in trkpts){
             var trkpt = trkpts[idxIn];
+            /** @type {import('../index.js').Point} */
             let pt = {};
             pt.lat = parseFloat(trkpt.getAttribute("lat"));
             pt.lon = parseFloat(trkpt.getAttribute("lon"));
@@ -179,6 +195,8 @@ parse(gpxstring) {
 
         keepThis.tracks.push(track);
     }
+
+    return this;
 };
 
 /**
@@ -187,7 +205,7 @@ parse(gpxstring) {
  * @param  {Element} parent - Parent DOM Element
  * @param  {string} needle - Name of the searched element
  * 
- * @return {} The element value
+ * @return The element value
  */
 getElementValue(parent, needle){
     let elem = parent.querySelector(needle);
@@ -204,7 +222,7 @@ getElementValue(parent, needle){
  * @param  {Element} parent - Parent DOM Element
  * @param  {string} needle - Name of the searched element
  * 
- * @return {} The element value
+ * @return The element value
  */
 queryDirectSelector(parent, needle) {
 
@@ -228,11 +246,12 @@ queryDirectSelector(parent, needle) {
 /**
  * Calcul the Distance Object from an array of points
  * 
- * @param  {} points - An array of points with lat and lon properties
+ * @param  {import('../index.js').Point[]} points - An array of points with lat and lon properties
  * 
- * @return {DistanceObject} An object with total distance and Cumulative distances
+ * @return {import('../index.js').Distance} An object with total distance and Cumulative distances
  */
 calculDistance(points) {
+    /** @type {import('../index.js').Distance} */
     let distance = {};
     let totalDistance = 0;
     let cumulDistance = [];
@@ -251,15 +270,17 @@ calculDistance(points) {
 /**
  * Calcul Distance between two points with lat and lon
  * 
- * @param  {} wpt1 - A geographic point with lat and lon properties
- * @param  {} wpt2 - A geographic point with lat and lon properties
+ * @param  {import('../index.js').Point} wpt1 - A geographic point with lat and lon properties
+ * @param  {import('../index.js').Point} wpt2 - A geographic point with lat and lon properties
  * 
- * @returns {float} The distance between the two points
+ * @returns {number} The distance between the two points
  */
 calcDistanceBetween(wpt1, wpt2) {
+    /** @type {import('../index.js').Point} */
     let latlng1 = {};
     latlng1.lat = wpt1.lat;
     latlng1.lon = wpt1.lon;
+    /** @type {import('../index.js').Point} */
     let latlng2 = {};
     latlng2.lat = wpt2.lat;
     latlng2.lon = wpt2.lon;
@@ -276,13 +297,14 @@ calcDistanceBetween(wpt1, wpt2) {
 /**
  * Generate Elevation Object from an array of points
  * 
- * @param  {} points - An array of points with ele property
+ * @param  {import('../index.js').Point[]} points - An array of points with ele property
  * 
- * @returns {ElevationObject} An object with negative and positive height difference and average, max and min altitude data
+ * @returns {import('../index.js').Elevation} An object with negative and positive height difference and average, max and min altitude data
  */
 calcElevation(points) {
     var dp = 0,
         dm = 0,
+        /** @type {import('../index.js').Elevation} */
         ret = {};
 
     for (var i = 0; i < points.length - 1; i++) {
@@ -300,6 +322,7 @@ calcElevation(points) {
         }
     }
 
+    /** @type {number[]} */
     var elevation = [];
     var sum = 0;
 
@@ -325,12 +348,13 @@ calcElevation(points) {
 /**
  * Generate slopes Object from an array of Points and an array of Cumulative distance 
  * 
- * @param  {} points - An array of points with ele property
- * @param  {} cumul - An array of cumulative distance
+ * @param  {import('../index.js').Point[]} points - An array of points with ele property
+ * @param  {number[]} cumul - An array of cumulative distance
  * 
- * @returns {SlopeObject} An array of slopes
+ * @returns {number[]} An array of slopes
  */
 calculSlope(points, cumul) {
+    /** @type {number[]} */
     let slopes = [];
 
     for (var i = 0; i < points.length - 1; i++) {
@@ -349,11 +373,12 @@ calculSlope(points, cumul) {
 /**
  * Export the GPX object to a GeoJSON formatted Object
  * 
- * @returns {} a GeoJSON formatted Object
+ * @returns a GeoJSON formatted Object
  */
 toGeoJSON() {
     var GeoJSON = {
         "type": "FeatureCollection",
+        /** @type {{ type: string; geometry: { type: string; coordinates: [number, number, number][]; }; properties: import('../index.js').Track; }[]} */
         "features": [],
         "properties": {
             "name": this.metadata.name,
@@ -367,7 +392,8 @@ toGeoJSON() {
     for(let idx in this.tracks) {
         let track = this.tracks[idx];
 
-        var feature = {
+        /** @type {typeof GeoJSON.features[number]} */
+        let feature = {
             "type": "Feature",
             "geometry": {
                 "type": "LineString",
@@ -388,7 +414,8 @@ toGeoJSON() {
         for(let idx in track.points) {
             let pt = track.points[idx];
         
-            var geoPt = [];
+            /** @type {typeof GeoJSON.features[number]["geometry"]["coordinates"][number]} */
+            let geoPt = [];
             geoPt.push(pt.lon);
             geoPt.push(pt.lat);
             geoPt.push(pt.ele);
@@ -402,7 +429,8 @@ toGeoJSON() {
     for(let idx in this.routes) {
         let track = this.routes[idx];
 
-        var feature = {
+        /** @type {typeof GeoJSON.features[number]} */
+        let feature = {
             "type": "Feature",
             "geometry": {
                 "type": "LineString",
@@ -424,7 +452,8 @@ toGeoJSON() {
         for(let idx in track.points) {
             let pt = track.points[idx];
         
-            var geoPt = [];
+            /** @type {typeof GeoJSON.features[number]["geometry"]["coordinates"][number]} */
+            let geoPt = [];
             geoPt.push(pt.lon);
             geoPt.push(pt.lat);
             geoPt.push(pt.ele);
@@ -438,7 +467,8 @@ toGeoJSON() {
     for(let idx in this.waypoints) {
         let pt = this.waypoints[idx];
     
-        var feature = {
+        /** @type {typeof GeoJSON.features[number]} */
+        let feature = {
             "type": "Feature",
             "geometry": {
                 "type": "Point",
