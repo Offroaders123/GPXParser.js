@@ -1,95 +1,83 @@
-export type MetaData = {
-  name: string
-  desc: string
-  link: Link
-  author: Author
-  time: Date
+export interface MetaData {
+  name: string;
+  desc: string;
+  link: Link;
+  author: Author;
+  time: Date;
 }
 
-export type Waypoint = {
-  name: string
-  sym: string
-  cmt: string
-  desc: string
-  lat: number
-  lon: number
-  ele: number | null
-  time: Date | null
+export interface Waypoint {
+  name: string;
+  sym: string;
+  cmt: string;
+  desc: string;
+  lat: number;
+  lon: number;
+  ele: number | null;
+  time: Date | null;
 }
 
-export type Track = {
-  name: string
-  cmt: string
-  desc: string
-  src: string
-  number: string
-  link: Link
-  type: string | null
-  points: Point[]
-  distance: Distance
-  elevation: Elevation
-  slopes: number[]
+export interface Track {
+  name: string;
+  cmt: string;
+  desc: string;
+  src: string;
+  number: string;
+  link: Link;
+  type: string | null;
+  points: Point[];
+  distance: Distance;
+  elevation: Elevation;
+  slopes: number[];
 }
 
-export type Route = {
-  name: string
-  cmt: string
-  desc: string
-  src: string
-  number: string
-  link: Link
-  type: string | null
-  points: Point[]
-  distance: Distance
-  elevation: Elevation
-  slopes: number[]
+export interface Route {
+  name: string;
+  cmt: string;
+  desc: string;
+  src: string;
+  number: string;
+  link: Link;
+  type: string | null;
+  points: Point[];
+  distance: Distance;
+  elevation: Elevation;
+  slopes: number[];
 }
 
-export type Point = {
-  lat: number
-  lon: number
-  ele: number | null
-  time: Date | null
+export interface Point {
+  lat: number;
+  lon: number;
+  ele: number | null;
+  time: Date | null;
 }
 
-export type Distance = {
-  total: number
-  cumul: number[]
+export interface Distance {
+  total: number;
+  cumul: number[];
 }
 
-export type Elevation = {
-  max: number
-  min: number
-  pos: number
-  neg: number
-  avg: number
+export interface Elevation {
+  max: number;
+  min: number;
+  pos: number;
+  neg: number;
+  avg: number;
 }
 
-export type Author = {
-  name: string
-  email: Email
-  link: Link
+export interface Author {
+  name: string;
+  email: Email;
+  link: Link;
 }
 
-export type Email = {
-  id: string
-  domain: string
+export interface Email {
+  id: string;
+  domain: string;
 }
 
-export type Link = {
-  href: string
-  text: string
-  type: string
+export interface Link {
+  href: string;
+  text: string;
+  type: string;
 }
-
-declare class GpxParser {
-  xmlSource: string
-  metadata: MetaData
-  waypoints: Waypoint[]
-  tracks: Track[]
-  routes: Route[]
-  parse(xml: string): any
-  getElementValue(element: Element, needle: string): any
-}
-
-export default GpxParser
