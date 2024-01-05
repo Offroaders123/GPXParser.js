@@ -58,11 +58,11 @@ export interface Distance {
 }
 
 export interface Elevation {
-  max: number;
-  min: number;
-  pos: number;
-  neg: number;
-  avg: number;
+  max: number | null;
+  min: number | null;
+  pos: number | null;
+  neg: number | null;
+  avg: number | null;
 }
 
 export interface Author {

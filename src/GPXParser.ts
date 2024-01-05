@@ -2,10 +2,8 @@ import type { MetaData, Waypoint, Track, Route, Author, Link, Point, Distance, E
 
 /**
  * GPX file parser
- * 
- * @constructor
  */
-class gpxParser {
+export default class GPXParser {
   xmlSource: Document | "" = "";
   metadata: MetaData = {};
   waypoints: Waypoint[] = [];
@@ -15,35 +13,33 @@ class gpxParser {
   /**
    * Parse a gpx formatted string to a GPXParser Object
    * 
-   * @param gpxstring - A GPX formatted String
+   * @param gpxString - A GPX formatted String
    * 
    * @return A GPXParser object
    */
-  parse(gpxstring: string): gpxParser {
-    let keepThis = this;
+  parse(gpxString: string): GPXParser {
+    const domParser = new window.DOMParser();
+    this.xmlSource = domParser.parseFromString(gpxString, 'text/xml');
 
-    let domParser = new window.DOMParser();
-    this.xmlSource = domParser.parseFromString(gpxstring, 'text/xml');
-
-    let metadata = this.xmlSource.querySelector('metadata');
+    const metadata = this.xmlSource.querySelector('metadata');
     if (metadata != null) {
       this.metadata.name = this.getElementValue(metadata, "name");
       this.metadata.desc = this.getElementValue(metadata, "desc");
       this.metadata.time = this.getElementValue(metadata, "time");
 
-      let author: Author = {};
-      let authorElem = metadata.querySelector('author');
+      const author: Author = {};
+      const authorElem = metadata.querySelector('author');
       if (authorElem != null) {
         author.name = this.getElementValue(authorElem, "name");
         author.email = {};
-        let emailElem = authorElem.querySelector('email');
+        const emailElem = authorElem.querySelector('email');
         if (emailElem != null) {
           author.email.id = emailElem.getAttribute("id");
           author.email.domain = emailElem.getAttribute("domain");
         }
 
-        let link: Link = {};
-        let linkElem = authorElem.querySelector('link');
+        const link: Link = {};
+        const linkElem = authorElem.querySelector('link');
         if (linkElem != null) {
           link.href = linkElem.getAttribute('href');
           link.text = this.getElementValue(linkElem, "text");
@@ -53,8 +49,8 @@ class gpxParser {
       }
       this.metadata.author = author;
 
-      let link: Link = {};
-      let linkElem = this.queryDirectSelector(metadata, 'link');
+      const link: Link = {};
+      const linkElem = this.queryDirectSelector(metadata, 'link');
       if (linkElem != null) {
         link.href = linkElem.getAttribute('href');
         link.text = this.getElementValue(linkElem, "text");
@@ -63,120 +59,120 @@ class gpxParser {
       }
     }
 
-    var wpts = [...this.xmlSource.querySelectorAll('wpt')];
-    for (let idx in wpts) {
-      var wpt = wpts[idx];
-      let pt: Waypoint = {};
-      pt.name = keepThis.getElementValue(wpt, "name");
-      pt.sym = keepThis.getElementValue(wpt, "sym");
+    const wpts = [...this.xmlSource.querySelectorAll('wpt')];
+    for (const idx in wpts) {
+      const wpt = wpts[idx];
+      const pt: Waypoint = {};
+      pt.name = this.getElementValue(wpt, "name");
+      pt.sym = this.getElementValue(wpt, "sym");
       pt.lat = parseFloat(wpt.getAttribute("lat"));
       pt.lon = parseFloat(wpt.getAttribute("lon"));
 
-      let floatValue = parseFloat(keepThis.getElementValue(wpt, "ele"));
+      const floatValue = parseFloat(this.getElementValue(wpt, "ele"));
       pt.ele = isNaN(floatValue) ? null : floatValue;
 
-      pt.cmt = keepThis.getElementValue(wpt, "cmt");
-      pt.desc = keepThis.getElementValue(wpt, "desc");
+      pt.cmt = this.getElementValue(wpt, "cmt");
+      pt.desc = this.getElementValue(wpt, "desc");
 
-      let time = keepThis.getElementValue(wpt, "time");
+      const time = this.getElementValue(wpt, "time");
       pt.time = time == null ? null : new Date(time);
 
-      keepThis.waypoints.push(pt);
+      this.waypoints.push(pt);
     }
 
-    var rtes = [...this.xmlSource.querySelectorAll('rte')];
-    for (let idx in rtes) {
-      let rte = rtes[idx];
-      let route: Route = {};
-      route.name = keepThis.getElementValue(rte, "name");
-      route.cmt = keepThis.getElementValue(rte, "cmt");
-      route.desc = keepThis.getElementValue(rte, "desc");
-      route.src = keepThis.getElementValue(rte, "src");
-      route.number = keepThis.getElementValue(rte, "number");
+    const rtes = [...this.xmlSource.querySelectorAll('rte')];
+    for (const idx in rtes) {
+      const rte = rtes[idx];
+      const route: Route = {};
+      route.name = this.getElementValue(rte, "name");
+      route.cmt = this.getElementValue(rte, "cmt");
+      route.desc = this.getElementValue(rte, "desc");
+      route.src = this.getElementValue(rte, "src");
+      route.number = this.getElementValue(rte, "number");
 
-      let type = keepThis.queryDirectSelector(rte, "type");
+      const type = this.queryDirectSelector(rte, "type");
       route.type = type != null ? type.innerHTML : null;
 
-      let link: Link = {};
-      let linkElem = rte.querySelector('link');
+      const link: Link = {};
+      const linkElem = rte.querySelector('link');
       if (linkElem != null) {
         link.href = linkElem.getAttribute('href');
-        link.text = keepThis.getElementValue(linkElem, "text");
-        link.type = keepThis.getElementValue(linkElem, "type");
+        link.text = this.getElementValue(linkElem, "text");
+        link.type = this.getElementValue(linkElem, "type");
       }
       route.link = link;
 
-      let routepoints: Point[] = [];
-      var rtepts = [...rte.querySelectorAll('rtept')];
+      const routepoints: Point[] = [];
+      const rtepts = [...rte.querySelectorAll('rtept')];
 
-      for (let idxIn in rtepts) {
-        let rtept = rtepts[idxIn];
-        let pt: Point = {};
+      for (const idxIn in rtepts) {
+        const rtept = rtepts[idxIn];
+        const pt: Point = {};
         pt.lat = parseFloat(rtept.getAttribute("lat"));
         pt.lon = parseFloat(rtept.getAttribute("lon"));
 
-        let floatValue = parseFloat(keepThis.getElementValue(rtept, "ele"));
+        const floatValue = parseFloat(this.getElementValue(rtept, "ele"));
         pt.ele = isNaN(floatValue) ? null : floatValue;
 
-        let time = keepThis.getElementValue(rtept, "time");
+        const time = this.getElementValue(rtept, "time");
         pt.time = time == null ? null : new Date(time);
 
         routepoints.push(pt);
       }
 
-      route.distance = keepThis.calculDistance(routepoints);
-      route.elevation = keepThis.calcElevation(routepoints);
-      route.slopes = keepThis.calculSlope(routepoints, route.distance.cumul);
+      route.distance = this.calculDistance(routepoints);
+      route.elevation = this.calcElevation(routepoints);
+      route.slopes = this.calculSlope(routepoints, route.distance.cumul);
       route.points = routepoints;
 
-      keepThis.routes.push(route);
+      this.routes.push(route);
     }
 
-    var trks = [...this.xmlSource.querySelectorAll('trk')];
-    for (let idx in trks) {
-      let trk = trks[idx];
-      let track: Track = {};
+    const trks = [...this.xmlSource.querySelectorAll('trk')];
+    for (const idx in trks) {
+      const trk = trks[idx];
+      const track: Track = {};
 
-      track.name = keepThis.getElementValue(trk, "name");
-      track.cmt = keepThis.getElementValue(trk, "cmt");
-      track.desc = keepThis.getElementValue(trk, "desc");
-      track.src = keepThis.getElementValue(trk, "src");
-      track.number = keepThis.getElementValue(trk, "number");
+      track.name = this.getElementValue(trk, "name");
+      track.cmt = this.getElementValue(trk, "cmt");
+      track.desc = this.getElementValue(trk, "desc");
+      track.src = this.getElementValue(trk, "src");
+      track.number = this.getElementValue(trk, "number");
 
-      let type = keepThis.queryDirectSelector(trk, "type");
+      const type = this.queryDirectSelector(trk, "type");
       track.type = type != null ? type.innerHTML : null;
 
-      let link: Link = {};
-      let linkElem = trk.querySelector('link');
+      const link: Link = {};
+      const linkElem = trk.querySelector('link');
       if (linkElem != null) {
         link.href = linkElem.getAttribute('href');
-        link.text = keepThis.getElementValue(linkElem, "text");
-        link.type = keepThis.getElementValue(linkElem, "type");
+        link.text = this.getElementValue(linkElem, "text");
+        link.type = this.getElementValue(linkElem, "type");
       }
       track.link = link;
 
-      let trackpoints: Point[] = [];
-      let trkpts = [...trk.querySelectorAll('trkpt')];
-      for (let idxIn in trkpts) {
-        var trkpt = trkpts[idxIn];
-        let pt: Point = {};
+      const trackpoints: Point[] = [];
+      const trkpts = [...trk.querySelectorAll('trkpt')];
+      for (const idxIn in trkpts) {
+        const trkpt = trkpts[idxIn];
+        const pt: Point = {};
         pt.lat = parseFloat(trkpt.getAttribute("lat"));
         pt.lon = parseFloat(trkpt.getAttribute("lon"));
 
-        let floatValue = parseFloat(keepThis.getElementValue(trkpt, "ele"));
+        const floatValue = parseFloat(this.getElementValue(trkpt, "ele"));
         pt.ele = isNaN(floatValue) ? null : floatValue;
 
-        let time = keepThis.getElementValue(trkpt, "time");
+        const time = this.getElementValue(trkpt, "time");
         pt.time = time == null ? null : new Date(time);
 
         trackpoints.push(pt);
       }
-      track.distance = keepThis.calculDistance(trackpoints);
-      track.elevation = keepThis.calcElevation(trackpoints);
-      track.slopes = keepThis.calculSlope(trackpoints, track.distance.cumul);
+      track.distance = this.calculDistance(trackpoints);
+      track.elevation = this.calcElevation(trackpoints);
+      track.slopes = this.calculSlope(trackpoints, track.distance.cumul);
       track.points = trackpoints;
 
-      keepThis.tracks.push(track);
+      this.tracks.push(track);
     }
 
     return this;
@@ -191,7 +187,7 @@ class gpxParser {
    * @return The element value
    */
   getElementValue(parent: Element, needle: string) {
-    let elem = parent.querySelector(needle);
+    const elem = parent.querySelector(needle);
     if (elem != null) {
       return elem.innerHTML != undefined ? elem.innerHTML : elem.childNodes[0].data;
     }
@@ -206,15 +202,15 @@ class gpxParser {
    * 
    * @return The element value
    */
-  queryDirectSelector(parent: Element, needle: string) {
-    let elements = parent.querySelectorAll(needle);
+  queryDirectSelector(parent: Element, needle: string): Element {
+    const elements = parent.querySelectorAll(needle);
     let finalElem = elements[0];
 
     if (elements.length > 1) {
-      let directChilds = parent.childNodes;
+      const directChilds = parent.childNodes;
 
-      for (let idx in directChilds) {
-        let elem = directChilds[idx];
+      for (const idx in directChilds) {
+        const elem = directChilds[idx];
         if (elem.tagName === needle) {
           finalElem = elem;
         }
@@ -232,10 +228,10 @@ class gpxParser {
    * @return An object with total distance and Cumulative distances
    */
   calculDistance(points: Point[]): Distance {
-    let distance: Distance = {};
+    const distance: Distance = {};
     let totalDistance = 0;
-    let cumulDistance = [];
-    for (var i = 0; i < points.length - 1; i++) {
+    const cumulDistance = [];
+    for (let i = 0; i < points.length - 1; i++) {
       totalDistance += this.calcDistanceBetween(points[i], points[i + 1]);
       cumulDistance[i] = totalDistance;
     }
@@ -256,13 +252,13 @@ class gpxParser {
    * @returns The distance between the two points
    */
   calcDistanceBetween(wpt1: Point, wpt2: Point): number {
-    let latlng1: Point = {};
+    const latlng1: Point = {};
     latlng1.lat = wpt1.lat;
     latlng1.lon = wpt1.lon;
-    let latlng2: Point = {};
+    const latlng2: Point = {};
     latlng2.lat = wpt2.lat;
     latlng2.lon = wpt2.lon;
-    var rad = Math.PI / 180,
+    const rad = Math.PI / 180,
       lat1 = latlng1.lat * rad,
       lat2 = latlng2.lat * rad,
       sinDLat = Math.sin((latlng2.lat - latlng1.lat) * rad / 2),
@@ -280,16 +276,16 @@ class gpxParser {
    * @returns An object with negative and positive height difference and average, max and min altitude data
    */
   calcElevation(points: Point[]): Elevation {
-    var dp = 0,
+    let dp = 0,
       dm = 0,
       ret: Elevation = {};
 
-    for (var i = 0; i < points.length - 1; i++) {
-      let rawNextElevation = points[i + 1].ele;
-      let rawElevation = points[i].ele;
+    for (let i = 0; i < points.length - 1; i++) {
+      const rawNextElevation = points[i + 1].ele;
+      const rawElevation = points[i].ele;
 
       if (rawNextElevation !== null && rawElevation !== null) {
-        let diff = parseFloat(rawNextElevation) - parseFloat(rawElevation);
+        const diff = parseFloat(rawNextElevation) - parseFloat(rawElevation);
 
         if (diff < 0) {
           dm += diff;
@@ -299,14 +295,14 @@ class gpxParser {
       }
     }
 
-    var elevation: number[] = [];
-    var sum = 0;
+    const elevation: number[] = [];
+    let sum = 0;
 
-    for (var i = 0, len = points.length; i < len; i++) {
-      let rawElevation = points[i].ele;
+    for (let i = 0, len = points.length; i < len; i++) {
+      const rawElevation = points[i].ele;
 
       if (rawElevation !== null) {
-        var ele = parseFloat(points[i].ele);
+        const ele = parseFloat(points[i].ele);
         elevation.push(ele);
         sum += ele;
       }
@@ -330,15 +326,15 @@ class gpxParser {
    * @returns An array of slopes
    */
   calculSlope(points: Point[], cumul: number[]): number[] {
-    let slopes: number[] = [];
+    const slopes: number[] = [];
 
-    for (var i = 0; i < points.length - 1; i++) {
-      let point = points[i];
-      let nextPoint = points[i + 1];
-      let elevationDiff = nextPoint.ele - point.ele;
-      let distance = cumul[i + 1] - cumul[i];
+    for (let i = 0; i < points.length - 1; i++) {
+      const point = points[i];
+      const nextPoint = points[i + 1];
+      const elevationDiff = nextPoint.ele - point.ele;
+      const distance = cumul[i + 1] - cumul[i];
 
-      let slope = (elevationDiff * 100) / distance;
+      const slope = (elevationDiff * 100) / distance;
       slopes.push(slope);
     }
 
@@ -351,7 +347,7 @@ class gpxParser {
    * @returns a GeoJSON formatted Object
    */
   toGeoJSON() {
-    var GeoJSON = {
+    const GeoJSON = {
       "type": "FeatureCollection",
       "features": [] as { type: string; geometry: { type: string; coordinates: [number, number, number | null][]; }; properties: Track; }[],
       "properties": {
@@ -363,10 +359,10 @@ class gpxParser {
       },
     };
 
-    for (let idx in this.tracks) {
-      let track = this.tracks[idx];
+    for (const idx in this.tracks) {
+      const track = this.tracks[idx];
 
-      let feature: typeof GeoJSON.features[number] = {
+      const feature: typeof GeoJSON.features[number] = {
         "type": "Feature",
         "geometry": {
           "type": "LineString",
@@ -384,10 +380,10 @@ class gpxParser {
       feature.properties.link = track.link;
       feature.properties.type = track.type;
 
-      for (let idx in track.points) {
-        let pt = track.points[idx];
+      for (const idx in track.points) {
+        const pt = track.points[idx];
 
-        let geoPt: typeof GeoJSON.features[number]["geometry"]["coordinates"][number] = [];
+        const geoPt: typeof GeoJSON.features[number]["geometry"]["coordinates"][number] = [];
         geoPt.push(pt.lon);
         geoPt.push(pt.lat);
         geoPt.push(pt.ele);
@@ -398,10 +394,10 @@ class gpxParser {
       GeoJSON.features.push(feature);
     }
 
-    for (let idx in this.routes) {
-      let track = this.routes[idx];
+    for (const idx in this.routes) {
+      const track = this.routes[idx];
 
-      let feature: typeof GeoJSON.features[number] = {
+      const feature: typeof GeoJSON.features[number] = {
         "type": "Feature",
         "geometry": {
           "type": "LineString",
@@ -420,10 +416,10 @@ class gpxParser {
       feature.properties.type = track.type;
 
 
-      for (let idx in track.points) {
-        let pt = track.points[idx];
+      for (const idx in track.points) {
+        const pt = track.points[idx];
 
-        let geoPt: typeof GeoJSON.features[number]["geometry"]["coordinates"][number] = [];
+        const geoPt: typeof GeoJSON.features[number]["geometry"]["coordinates"][number] = [];
         geoPt.push(pt.lon);
         geoPt.push(pt.lat);
         geoPt.push(pt.ele);
@@ -434,10 +430,10 @@ class gpxParser {
       GeoJSON.features.push(feature);
     }
 
-    for (let idx in this.waypoints) {
-      let pt = this.waypoints[idx];
+    for (const idx in this.waypoints) {
+      const pt = this.waypoints[idx];
 
-      let feature: typeof GeoJSON.features[number] = {
+      const feature: typeof GeoJSON.features[number] = {
         "type": "Feature",
         "geometry": {
           "type": "Point",
@@ -463,5 +459,4 @@ class gpxParser {
 
 if (typeof module !== 'undefined') {
   require('jsdom-global')();
-  module.exports = gpxParser;
 }
