@@ -34,14 +34,14 @@ export default class GPXParser {
         author.email = {};
         const emailElem = authorElem.querySelector('email');
         if (emailElem != null) {
-          author.email.id = emailElem.getAttribute("id");
-          author.email.domain = emailElem.getAttribute("domain");
+          author.email.id = emailElem.getAttribute("id")!;
+          author.email.domain = emailElem.getAttribute("domain")!;
         }
 
         const link: Link = {};
         const linkElem = authorElem.querySelector('link');
         if (linkElem != null) {
-          link.href = linkElem.getAttribute('href');
+          link.href = linkElem.getAttribute('href')!;
           link.text = this.getElementValue(linkElem, "text");
           link.type = this.getElementValue(linkElem, "type");
         }
@@ -52,7 +52,7 @@ export default class GPXParser {
       const link: Link = {};
       const linkElem = this.queryDirectSelector(metadata, 'link');
       if (linkElem != null) {
-        link.href = linkElem.getAttribute('href');
+        link.href = linkElem.getAttribute('href')!;
         link.text = this.getElementValue(linkElem, "text");
         link.type = this.getElementValue(linkElem, "type");
         this.metadata.link = link;
@@ -65,8 +65,8 @@ export default class GPXParser {
       const pt: Waypoint = {};
       pt.name = this.getElementValue(wpt, "name");
       pt.sym = this.getElementValue(wpt, "sym");
-      pt.lat = parseFloat(wpt.getAttribute("lat"));
-      pt.lon = parseFloat(wpt.getAttribute("lon"));
+      pt.lat = parseFloat(wpt.getAttribute("lat")!);
+      pt.lon = parseFloat(wpt.getAttribute("lon")!);
 
       const floatValue = parseFloat(this.getElementValue(wpt, "ele"));
       pt.ele = isNaN(floatValue) ? null : floatValue;
@@ -96,7 +96,7 @@ export default class GPXParser {
       const link: Link = {};
       const linkElem = rte.querySelector('link');
       if (linkElem != null) {
-        link.href = linkElem.getAttribute('href');
+        link.href = linkElem.getAttribute('href')!;
         link.text = this.getElementValue(linkElem, "text");
         link.type = this.getElementValue(linkElem, "type");
       }
@@ -108,8 +108,8 @@ export default class GPXParser {
       for (const idxIn in rtepts) {
         const rtept = rtepts[idxIn];
         const pt: Point = {};
-        pt.lat = parseFloat(rtept.getAttribute("lat"));
-        pt.lon = parseFloat(rtept.getAttribute("lon"));
+        pt.lat = parseFloat(rtept.getAttribute("lat")!);
+        pt.lon = parseFloat(rtept.getAttribute("lon")!);
 
         const floatValue = parseFloat(this.getElementValue(rtept, "ele"));
         pt.ele = isNaN(floatValue) ? null : floatValue;
@@ -145,7 +145,7 @@ export default class GPXParser {
       const link: Link = {};
       const linkElem = trk.querySelector('link');
       if (linkElem != null) {
-        link.href = linkElem.getAttribute('href');
+        link.href = linkElem.getAttribute('href')!;
         link.text = this.getElementValue(linkElem, "text");
         link.type = this.getElementValue(linkElem, "type");
       }
@@ -156,8 +156,8 @@ export default class GPXParser {
       for (const idxIn in trkpts) {
         const trkpt = trkpts[idxIn];
         const pt: Point = {};
-        pt.lat = parseFloat(trkpt.getAttribute("lat"));
-        pt.lon = parseFloat(trkpt.getAttribute("lon"));
+        pt.lat = parseFloat(trkpt.getAttribute("lat")!);
+        pt.lon = parseFloat(trkpt.getAttribute("lon")!);
 
         const floatValue = parseFloat(this.getElementValue(trkpt, "ele"));
         pt.ele = isNaN(floatValue) ? null : floatValue;
@@ -348,14 +348,14 @@ export default class GPXParser {
    */
   toGeoJSON() {
     const GeoJSON = {
-      "type": "FeatureCollection",
-      "features": [] as { type: string; geometry: { type: string; coordinates: [number, number, number | null][]; }; properties: Track; }[],
-      "properties": {
-        "name": this.metadata.name,
-        "desc": this.metadata.desc,
-        "time": this.metadata.time,
-        "author": this.metadata.author,
-        "link": this.metadata.link,
+      type: "FeatureCollection",
+      features: [] as { type: string; geometry: { type: string; coordinates: [number, number, number | null][]; }; properties: Track; }[],
+      properties: {
+        name: this.metadata.name,
+        desc: this.metadata.desc,
+        time: this.metadata.time,
+        author: this.metadata.author,
+        link: this.metadata.link,
       },
     };
 
@@ -363,30 +363,30 @@ export default class GPXParser {
       const track = this.tracks[idx];
 
       const feature: typeof GeoJSON.features[number] = {
-        "type": "Feature",
-        "geometry": {
-          "type": "LineString",
-          "coordinates": []
+        type: "Feature",
+        geometry: {
+          type: "LineString",
+          coordinates: []
         },
-        "properties": {
+        properties: {
+          name: track.name,
+          cmt: track.cmt,
+          desc: track.desc,
+          src: track.src,
+          number: track.number,
+          link: track.link,
+          type: track.type
         }
       };
-
-      feature.properties.name = track.name;
-      feature.properties.cmt = track.cmt;
-      feature.properties.desc = track.desc;
-      feature.properties.src = track.src;
-      feature.properties.number = track.number;
-      feature.properties.link = track.link;
-      feature.properties.type = track.type;
 
       for (const idx in track.points) {
         const pt = track.points[idx];
 
-        const geoPt: typeof GeoJSON.features[number]["geometry"]["coordinates"][number] = [];
-        geoPt.push(pt.lon);
-        geoPt.push(pt.lat);
-        geoPt.push(pt.ele);
+        const geoPt: typeof GeoJSON.features[number]["geometry"]["coordinates"][number] = [
+          pt.lon,
+          pt.lat,
+          pt.ele
+        ];
 
         feature.geometry.coordinates.push(geoPt);
       }
@@ -398,31 +398,30 @@ export default class GPXParser {
       const track = this.routes[idx];
 
       const feature: typeof GeoJSON.features[number] = {
-        "type": "Feature",
-        "geometry": {
-          "type": "LineString",
-          "coordinates": []
+        type: "Feature",
+        geometry: {
+          type: "LineString",
+          coordinates: []
         },
-        "properties": {
+        properties: {
+          name: track.name,
+          cmt: track.cmt,
+          desc: track.desc,
+          src: track.src,
+          number: track.number,
+          link: track.link,
+          type: track.type
         }
       };
-
-      feature.properties.name = track.name;
-      feature.properties.cmt = track.cmt;
-      feature.properties.desc = track.desc;
-      feature.properties.src = track.src;
-      feature.properties.number = track.number;
-      feature.properties.link = track.link;
-      feature.properties.type = track.type;
-
 
       for (const idx in track.points) {
         const pt = track.points[idx];
 
-        const geoPt: typeof GeoJSON.features[number]["geometry"]["coordinates"][number] = [];
-        geoPt.push(pt.lon);
-        geoPt.push(pt.lat);
-        geoPt.push(pt.ele);
+        const geoPt: typeof GeoJSON.features[number]["geometry"]["coordinates"][number] = [
+          pt.lon,
+          pt.lat,
+          pt.ele
+        ];
 
         feature.geometry.coordinates.push(geoPt);
       }
@@ -434,19 +433,18 @@ export default class GPXParser {
       const pt = this.waypoints[idx];
 
       const feature: typeof GeoJSON.features[number] = {
-        "type": "Feature",
-        "geometry": {
-          "type": "Point",
-          "coordinates": []
+        type: "Feature",
+        geometry: {
+          type: "Point",
+          coordinates: []
         },
-        "properties": {
+        properties: {
+          name: pt.name,
+          sym: pt.sym,
+          cmt: pt.cmt,
+          desc: pt.desc
         }
       };
-
-      feature.properties.name = pt.name;
-      feature.properties.sym = pt.sym;
-      feature.properties.cmt = pt.cmt;
-      feature.properties.desc = pt.desc;
 
       feature.geometry.coordinates = [pt.lon, pt.lat, pt.ele];
 
