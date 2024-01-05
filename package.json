@@ -4,7 +4,7 @@
   "description": "GPX file parser",
   "main": "dist/GPXParser.min.js",
   "scripts": {
-    "test": "nyc mocha"
+    "test": "nyc ts-mocha --paths ./test/*.ts"
   },
   "repository": {
     "type": "git",
@@ -42,6 +42,7 @@
     "jsdom": "^15.2.1",
     "mocha": "^10.2.0",
     "nyc": "^15.1.0",
+    "ts-mocha": "^10.0.0",
     "typescript": "^5.3.3"
   }
 }

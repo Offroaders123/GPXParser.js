@@ -1,4 +1,4 @@
-let gpxParser = require('../src/GPXParser.js');
+let gpxParser = require('../src/GPXParser');
 let assert = require('assert');
 require('jsdom-global')();
 global.DOMParser = window.DOMParser;

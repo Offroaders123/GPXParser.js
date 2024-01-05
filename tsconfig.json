@@ -1,7 +1,5 @@
 {
   "compilerOptions": {
-    "allowJs": true,
-    "checkJs": true,
     "module": "CommonJS",
     "target": "ES2015",
     "isolatedModules": true,
