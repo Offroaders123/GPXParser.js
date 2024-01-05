@@ -28,6 +28,12 @@
     "jsdom-global": "^3.0.2"
   },
   "devDependencies": {
+    "@types/gulp": "^4.0.17",
+    "@types/gulp-minify": "^3.1.5",
+    "@types/gulp-mocha": "^0.0.37",
+    "@types/jsdom-global": "^3.0.7",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "^20.10.6",
     "gulp": "^4.0.2",
     "gulp-jsdoc3": "^2.0.0",
     "gulp-minify": "^3.1.0",
@@ -35,6 +41,7 @@
     "jsdoc": "^3.6.3",
     "jsdom": "^15.2.1",
     "mocha": "^6.2.2",
-    "nyc": "^15.0.0"
+    "nyc": "^15.0.0",
+    "typescript": "^5.3.3"
   }
 }
